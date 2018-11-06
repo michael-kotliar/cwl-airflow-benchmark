@@ -11,7 +11,7 @@ inputs:
     type: int
     inputBinding:
       position: 1
-    default: 60
+    default: 3600
 
 outputs: []
 
