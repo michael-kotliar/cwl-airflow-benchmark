@@ -1,5 +1,6 @@
 Use `pstree -s scheduler` to check if command is running.
-
+Supported Python Docker SDK 2.7.0
+When running on MacOS make sure to share `/var/folders` with Docker
 
 ### One step DAG without Docker
 
