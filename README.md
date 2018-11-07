@@ -1,20 +1,32 @@
 Use `pstree -s scheduler` to check if command is running.
+
+Use 'docker ps' to check if container is running.
+
 Supported Python Docker SDK 2.7.0
+
 When running on MacOS make sure to share `/var/folders` with Docker
 
-### One step DAG without Docker
+Assuming your `airflow.cfg` includes
+      
+  ```
+  executor = LocalExecutor
+  task_runner = BashTaskRunner
+  ```
 
-Using Web Interface
 
-- Set `Task Instance` to `Fail`
+# One step DAG with BashOperator 
 
-  **What you get as a result:**
+## Set FAIL through Web Interface
+
+- ***Task Instance***
+  
+  What you get as a result
   
     ```
     command is killed
     ```
 
-  **What happens in Webserver**
+  What happens in Webserver
 
     ```
     POST to http://0.0.0.0:8080/admin/taskinstance/action/
@@ -38,39 +50,45 @@ Using Web Interface
           execution_date="execution_date"
     ```
     
-  **What happens in Scheduler**
+  What happens in Scheduler
   
   ```
-  # Assuming your airflow.cfg includes
-  executor = LocalExecutor
-  task_runner = BashTaskRunner
-
-  # Call airflow/jobs.py:2646 that monitors DB state
-  def heartbeat_callback(self, session=None)
+  # Monitore DB state 
+    def heartbeat_callback(self, session=None)  # airflow/jobs.py:2646
   
-  # Call airflow/jobs.py:2682 when state is changed
-  self.task_runner.terminate()
+  # If state is changed, initiate task termination
+    self.task_runner.terminate()  # airflow/jobs.py:2682
  
-  # Call airflow/task/task_runner/base_task_runner.py:39 to initiate the termination
-  def terminate(self):
+  # Depending on a task_runner type, proceed with termination further
+    def terminate(self)  # airflow/task/task_runner/base_task_runner.py:39
          
-  # Call airflow/utils/helpers.py:217 to terminate all childrens and grandchildren.
-  # Tries really hard to terminate all children (including grandchildren). Will send
-  # sig (SIGTERM) to the process group of pid. If any process is alive after timeout
-  # a SIGKILL will be send.
-  def reap_process_group(pid, log, sig=signal.SIGTERM, timeout=DEFAULT_TIME_TO_WAIT_AFTER_SIGTERM)
+  # Send SIGTERM to all childrens and grandchildren. After timeout sends SIGKILL
+    def reap_process_group(pid, log, sig=signal.SIGTERM, timeout=DEFAULT_TIME_TO_WAIT_AFTER_SIGTERM)  # airflow/utils/helpers.py:217
+  
+  # Catch SIGTERM from TaskInstance class
+    def signal_handler(signum, frame)  # airflow/models.py:1609
+  
+  # Send SIGTERM signal to bash process group 
+    def on_kill(self)  # airflow/operators/bash_operator.py
   ```
-        
-- Set `DAG Run` to `Fail`
 
-  Results:
+        
+        
+- ***DAG Run***
+
+  What you get as a result
 
     ```
     Doesn't influence on Task Instances
     Updates only DAG Run's state
+    Should be investigated more deeply
     ```
 
+## Terminate Scheduler
+
+## Update DB
 
 
+# One step DAG with DockerOperator
  
- 
+## Set FAIL through Web Interface
