@@ -84,7 +84,15 @@ Assuming your `airflow.cfg` includes
 
 ## Terminate Scheduler
 
+- ***Task Instance***
+
+- ***DAG Run***
+
 ## Update DB
+
+- ***Task Instance***
+
+- ***DAG Run***
 
 # One step DAG with DockerOperator
  
@@ -143,6 +151,8 @@ Assuming your `airflow.cfg` includes
   # Call stop to the running container through Docker API
     def on_kill(self)  # airflow/operators/docker_operator.py:236
   ```
+
+- ***DAG Run***
   
 ## Terminate Scheduler
 
@@ -165,3 +175,11 @@ Assuming your `airflow.cfg` includes
 
     signal.signal(signal.SIGTERM, signal_handler)
     ```
+
+- ***DAG Run***
+
+## Update DB
+
+- ***Task Instance***
+
+- ***DAG Run***
