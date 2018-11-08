@@ -86,11 +86,23 @@ Assuming your `airflow.cfg` includes
 
 - ***Task Instance***
 
+  What you get as a result
+  
+    ```
+    Command is NOT killed
+    ```
+
 - ***DAG Run***
 
 ## Update DB
 
 - ***Task Instance***
+
+  What you get as a result
+  
+    ```
+    command is killed
+    ```
 
 - ***DAG Run***
 
@@ -164,22 +176,16 @@ Assuming your `airflow.cfg` includes
     Docker container is NOT killed
     ```
 
-    If we could catch SIGTINT or SIGTERM from `execute` function of `DockerOperator`,
-    we could call `on_kill` and stop Docker container. However, all this signals are cought in Scheduler.
-    
-    ```python
-    def signal_handler(signum, frame):
-        self.log.error("Received SIGTERM. Terminating Docker Container.")
-        self.on_kill()
-        raise AirflowException("Task received SIGTERM signal")
-
-    signal.signal(signal.SIGTERM, signal_handler)
-    ```
-
 - ***DAG Run***
 
 ## Update DB
 
 - ***Task Instance***
+
+  What you get as a result
+  
+    ```
+    Docker container is killed
+    ```
 
 - ***DAG Run***
