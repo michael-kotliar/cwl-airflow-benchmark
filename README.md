@@ -80,7 +80,8 @@ Assuming your `airflow.cfg` includes
 
     ```
     Doesn't influence on Task Instances
-    Updates only DAG Run's state
+    Updates only DAG Run's state.
+    Should be investigated
     ```
 
   <details>
