@@ -36,13 +36,13 @@ Assuming your `airflow.cfg` includes
           action: set_failed
           rowid: task_id,dag_id,execution_date
         
-      # Call airflow/www/views.py:2644 where ids = rowid
-      def action_set_failed(self, ids)
+      # When calling the funtction ids = rowid
+      def action_set_failed(self, ids)  # airflow/www/views.py:2644
         
-      # Call airflow/www/views.py:2699 where ids = rowid and target_state = State.FAILED
-      def set_task_instance_state(self, ids, target_state, session=None)
+      # When calling the funtction ids = rowid and target_state = State.FAILED
+      def set_task_instance_state(self, ids, target_state, session=None)  # airflow/www/views.py:2699
         
-      # Execute, execution_date should look like "2018-11-04 19:00:00.000000"
+      # SQL equivalent, execution_date should look like "2018-11-04 19:00:00.000000"
       UPDATE task_instance
       SET state="failed"
       WHERE task_id="task_id" AND
@@ -81,8 +81,32 @@ Assuming your `airflow.cfg` includes
     ```
     Doesn't influence on Task Instances
     Updates only DAG Run's state
-    Should be investigated more deeply
     ```
+
+  <details>
+    <summary>What happens in Webserver</summary>
+        
+      POST to http://0.0.0.0:8080/admin/dagrun/action/
+      Data:
+          csrf_token: string
+          url: /admin/dagrun/
+          action: set_failed
+          rowid: 1
+                  
+      # When calling the function ids = rowid corresponds to id from dag_run table
+      def action_set_failed(self, ids)  # airflow/www/views.py:2561
+        
+      # When calling the function ids = rowid corresponds to id from dag_run table and target_state = State.FAILED
+      def set_dagrun_state(self, ids, target_state, session=None)  # airflow/www/views.py:2569
+        
+      # SQL equivalent, end_date is taken as timezone.utcnow(). In SQL it should look like "2018-11-04 19:00:00.000000"
+      UPDATE dag_run
+      SET state="failed", end_date="end_date"
+      WHERE id=int
+        
+  </details>
+
+
 
 ## Terminate Scheduler
 
@@ -193,3 +217,8 @@ Assuming your `airflow.cfg` includes
     ```
 
 - ***DAG Run***
+
+-------------
+Findings
+-------------
+1. To completely stop BioWardrobe experiment you should set FAIL state for all tasks of the DAG
