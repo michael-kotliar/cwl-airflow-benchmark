@@ -12,6 +12,9 @@ steps:
     run:
       class: CommandLineTool
       cwlVersion: v1.0
+      hints:
+        - class: DockerRequirement
+          dockerPull: ubuntu:xenial
       baseCommand:
         - sleep
         - "3600"
